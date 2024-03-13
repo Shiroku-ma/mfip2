@@ -10,6 +10,7 @@ char_dct = {
     "x", "-" # このマイナスは減算のマイナスではなく負を表すためのマイナス
 }
 
+# 掛け算の記号 * を省略する際に括弧の前に置かれる文字
 special = {
     "1", "2", "3", "4", "5",
     "6", "7", "8", "9", "0",
@@ -38,17 +39,25 @@ def expr(line):
 
 def term(line):
     global pos
-    v = factor(line)
+    v = element(line)
     while pos < len(line) and (line[pos] == "*" or line[pos] == "/" or (line[pos-1] in special and line[pos] == "(")):
         op = line[pos]
         pos += 1
         if op == "*":
-            v = v * factor(line)
+            v = v * element(line)
         elif op == "/":
-            v = v / factor(line)
+            v = v / element(line)
         elif op == "(":
             pos -= 1
-            v = v * factor(line)
+            v = v * element(line)
+    return v
+
+def element(line):
+    global pos
+    v = factor(line)
+    while pos < len(line) and line[pos] == "^":
+        pos += 1
+        v = v ** element(line)
     return v
 
 def factor(line):
@@ -83,25 +92,6 @@ def number(line):
         tmp = "-1"
     return Expr(Term(Fraction(tmp), exp))
 
-# 同類項でまとめる
-def simplify(expr: Expr):
-    simplified_terms =[]
-    exps = []
-    for term in expr.terms: # 指数を登録(重複なし)
-        if not term.exp in exps:
-            exps.append(term.exp)
-    for exp in exps:
-        value = Fraction(0)
-        for term in [_term for _term in expr.terms if _term.exp == exp]:
-            value += term.coef
-        simplified = Term(value, exp)
-        simplified_terms.append(simplified)
-    
-    result = Expr(Term(1,1))
-    result.terms = sorted(simplified_terms, key=lambda term: term.exp, reverse=True)
-    return result
-    
-
 if __name__ == "__main__":
     _line = input("> ")
     line = _line.replace(" ", "")
@@ -110,8 +100,8 @@ if __name__ == "__main__":
         v = eval2(line)
         if pos != len(line):
             raise IllegalExpressionException()
-        r = simplify(v)
-        print(r)
+        v.simplify()
+        print(v)
     except:
         import traceback
         traceback.print_exc()

@@ -18,13 +18,15 @@ class Term:
             return ""
         if exp == "0":
             return coef
-        if coef == "1":
-            if exp == "1":
+        if exp == "1":
+            if coef == "1":
                 return "x"
+            elif coef == "-1":
+                return "-x"
+            return coef + "x"
+        if coef == "1":
             coef = ""
         elif coef == "-1":
-            if exp == "1":
-                return "-x"
             coef = "-"
         
         return coef + "x^" + exp
