@@ -62,6 +62,19 @@ class Expression:
         if len(self.terms) == 1 and self.terms[0].exp == 0 and self.terms[0].coef.is_integer():
             return True
         return False
+    
+    def coefs(self):
+        self.simplify()
+        coefs = []
+        exps = [term.exp for term in self.terms]
+        i = 0
+        for e in range(exps[0],-1,-1):
+            if e in exps:
+                coefs.append(self.terms[i].coef)
+                i += 1
+            else:
+                coefs.append(Fraction(0))
+        return coefs
 
     def simplify(self):
         simplified_terms =[]

@@ -1,6 +1,7 @@
 from fractions import Fraction
 from term import Term
 from expression import Expression as Expr
+from equation import Equation
 
 pos = 0
 
@@ -95,16 +96,27 @@ def number(line):
 if __name__ == "__main__":
     _line = input("> ")
     line = _line.replace(" ", "")
+    eq = line.split("=")
     try:
         pos = 0
-        v = eval2(line)
-        if pos != len(line):
+        vl = eval2(eq[0])
+        if pos != len(eq[0]):
             raise IllegalExpressionException()
-        v.simplify()
-        print(v)
+        pos = 0
+        vr = eval2(eq[1])
+        if pos != len(eq[1]):
+            raise IllegalExpressionException()
+        equation = Equation(vl, vr)
+        ans = equation.solve()
+        if len(ans) == 1:
+            print(ans[0])
+        else:
+            print(ans[0])
+            print(ans[1])
     except:
         import traceback
         traceback.print_exc()
+
 
 # 1/2x => 1/(2x)
         
